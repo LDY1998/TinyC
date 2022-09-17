@@ -93,21 +93,27 @@ enum class TokenType
     Divide,
     LeftParenthesis,
     RightParenthesis,
+    Ident,
+
 };
 
 class Token
 {
 public:
     Token(TokenType t) noexcept : m_kind(t) {}
-    bool is_kind(TokenType t) {
+    Token(TokenType t, char *begin, char *end) noexcept : m_kind(t), m_lex_str(begin, end) {}
+    bool is_kind(TokenType t)
+    {
         return t == m_kind;
     }
 
-    bool is_one_of(TokenType t1, TokenType t2) {
+    bool is_one_of(TokenType t1, TokenType t2)
+    {
         return is_kind(t1) || is_kind(t2);
     }
     template <typename... Ts>
-    bool is_one_of(TokenType t1, TokenType t2, Ts... ts) {
+    bool is_one_of(TokenType t1, TokenType t2, Ts... ts)
+    {
         return is_kind(t1) || is_one_of(t2, ts...);
     }
 
@@ -120,11 +126,73 @@ class Scanner
 {
 
 public:
+    Token identifier();
+    Token num();
+    Token next();
+
 private:
     char *m_begin = nullptr;
+
+    char peek();
+    char get();
 };
+
+Token Scanner::identifier()
+{
+    char *begin = m_begin;
+    get();
+    while (is_ident_char(peek()))
+        get();
+    return Token(TokenType::Ident, begin, m_begin);
+}
+
+Token Scanner::num() {
+    char* begin = m_begin;
+    get();
+    while (isdigit(peek())) get();
+    return Token(TokenType::Number, begin, m_begin);
+}
+
+Token Scanner::next()
+{
+    char *begin = m_begin;
+    while (char c = get())
+    {
+        if (is_space(c))
+            continue;
+
+        if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')
+            return identifier();
+        if (c >= '0' && c <= '9')
+            return num();
+    }
+}
+
+char Scanner::peek()
+{
+    return *m_begin;
+}
+
+char Scanner::get()
+{
+    return *m_begin++;
+}
 
 bool is_space(char c) noexcept
 {
     return isspace(c);
+}
+
+bool is_ident_char(char c) noexcept
+{
+    if (c >= 'a' && c <= 'z')
+        return true;
+    if (c >= 'A' && c <= 'Z')
+        return true;
+    if (c >= '0' && c <= '9')
+        return true;
+    if (c == '_')
+        return true;
+
+    return false;
 }
