@@ -93,8 +93,13 @@ enum class TokenType
     Divide,
     LeftParenthesis,
     RightParenthesis,
+    LeftSquare,
+    RightSquare,
+    LeftBracket,
+    RightBracket,
+    Col,
     Ident,
-
+    UnExpected
 };
 
 class Token
@@ -146,10 +151,12 @@ Token Scanner::identifier()
     return Token(TokenType::Ident, begin, m_begin);
 }
 
-Token Scanner::num() {
-    char* begin = m_begin;
+Token Scanner::num()
+{
+    char *begin = m_begin;
     get();
-    while (isdigit(peek())) get();
+    while (isdigit(peek()))
+        get();
     return Token(TokenType::Number, begin, m_begin);
 }
 
@@ -165,7 +172,23 @@ Token Scanner::next()
             return identifier();
         if (c >= '0' && c <= '9')
             return num();
+        if (c == '(')
+            return Token(TokenType::LeftParenthesis, begin, m_begin);
+        if (c == ')')
+            return Token(TokenType::RightParenthesis, begin, m_begin);
+        if (c == '[')
+            return Token(TokenType::LeftSquare, begin, m_begin);
+        if (c == ')')
+            return Token(TokenType::RightSquare, begin, m_begin);
+        if (c == '{')
+            return Token(TokenType::LeftBracket, begin, m_begin);
+        if (c == '}')
+            return Token(TokenType::RightBracket, begin, m_begin);
+        if (c == ';')
+            return Token(TokenType::Col, begin, m_begin);
     }
+
+    return Token(TokenType::UnExpected, begin, m_begin);
 }
 
 char Scanner::peek()
