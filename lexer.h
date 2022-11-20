@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string.h>
+#include <vector>
 // A simple lexical analyzer for C/C++-style variable declarations.
 // The grammar for the declarations is as follows:
 //
@@ -87,10 +89,7 @@ enum class TokenType
     Invalid,
     EndOfFile,
     Number,
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
+    Op,
     LeftParenthesis,
     RightParenthesis,
     LeftSquare,
@@ -99,6 +98,8 @@ enum class TokenType
     RightBracket,
     Col,
     Ident,
+    KeyWord,
+    StringLiteral,
     UnExpected
 };
 
@@ -107,7 +108,7 @@ class Token
 public:
     Token(TokenType t) noexcept : m_kind(t) {}
     Token(TokenType t, char *begin, char *end) noexcept : m_kind(t), m_lex_str(begin, end) {}
-    bool is_kind(TokenType t)
+    bool is_kind(TokenType t) const
     {
         return t == m_kind;
     }
@@ -122,36 +123,85 @@ public:
         return is_kind(t1) || is_one_of(t2, ts...);
     }
 
+    friend bool operator==(const Token &lhs, const Token &rhs)
+    {
+        return lhs.m_kind == rhs.m_kind && lhs.get_lex_string() == rhs.get_lex_string();
+    }
+    std::string get_lex_string() const
+    {
+        return m_lex_str;
+    }
+
 private:
     TokenType m_kind{};
     std::string m_lex_str{};
 };
 
-class Scanner
+class Lexer
 {
 
 public:
-    Token identifier();
+    Lexer(std::string str);
+    std::vector<Token> lex();
+    Token keyword_identifier();
     Token num();
     Token next();
+    Token string_literal();
+    Token op();
+    Token delim();
 
 private:
     char *m_begin = nullptr;
-
+    std::string val;
     char peek();
     char get();
 };
 
-Token Scanner::identifier()
+bool is_space(char c) noexcept;
+bool is_ident_char(char c) noexcept;
+inline bool is_keyword(char *begin);
+bool is_op(char *begin) noexcept;
+
+Lexer::Lexer(std::string str)
+{
+    val = str;
+    m_begin = (char *)val.c_str();
+}
+
+Token Lexer::keyword_identifier()
 {
     char *begin = m_begin;
     get();
     while (is_ident_char(peek()))
         get();
+
+    if (is_keyword(begin))
+        return Token(TokenType::KeyWord, begin, m_begin);
     return Token(TokenType::Ident, begin, m_begin);
 }
 
-Token Scanner::num()
+Token Lexer::string_literal()
+{
+    char *begin = m_begin;
+    get();
+    while (peek() != '\"')
+        get();
+    get();
+
+    return Token(TokenType::StringLiteral, begin, m_begin);
+}
+
+Token Lexer::op()
+{
+    char *begin = m_begin;
+    char first_c = get();
+    char second_c = peek();
+    if (second_c == '=')
+        get();
+    return Token(TokenType::Op, begin, m_begin);
+}
+
+Token Lexer::num()
 {
     char *begin = m_begin;
     get();
@@ -160,43 +210,100 @@ Token Scanner::num()
     return Token(TokenType::Number, begin, m_begin);
 }
 
-Token Scanner::next()
+std::vector<Token> Lexer::lex()
+{
+    std::vector<Token> res;
+    while (true)
+    {
+        Token t = next();
+        res.push_back(t);
+        if (t.is_kind(TokenType::UnExpected))
+            break;
+    }
+
+    return res;
+}
+
+Token Lexer::next()
 {
     char *begin = m_begin;
-    while (char c = get())
+    while (char c = peek())
     {
         if (is_space(c))
             continue;
 
         if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')
-            return identifier();
+            return keyword_identifier();
         if (c >= '0' && c <= '9')
             return num();
-        if (c == '(')
-            return Token(TokenType::LeftParenthesis, begin, m_begin);
-        if (c == ')')
-            return Token(TokenType::RightParenthesis, begin, m_begin);
-        if (c == '[')
-            return Token(TokenType::LeftSquare, begin, m_begin);
-        if (c == ')')
-            return Token(TokenType::RightSquare, begin, m_begin);
-        if (c == '{')
-            return Token(TokenType::LeftBracket, begin, m_begin);
-        if (c == '}')
-            return Token(TokenType::RightBracket, begin, m_begin);
-        if (c == ';')
-            return Token(TokenType::Col, begin, m_begin);
+        
+        if (c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}' || c == ';')
+            return delim();
+        if (c == '\"')
+            return string_literal();
+
+        if (c == '=' || c == '+' || c == '-' || c == '*' || c == '/')
+            return op();
     }
 
     return Token(TokenType::UnExpected, begin, m_begin);
 }
 
-char Scanner::peek()
+Token Lexer::delim()
+{
+    char* begin = m_begin;
+    char c = get();
+    if (c == '(')
+        {
+            Token t = Token(TokenType::LeftParenthesis, begin, m_begin);
+            return t;
+        }
+        if (c == ')')
+        {
+            Token t = Token(TokenType::RightParenthesis, begin, m_begin);
+            return t;
+        }
+        if (c == '[')
+        {
+            Token t = Token(TokenType::LeftSquare, begin, m_begin);
+            return t;
+        }
+        if (c == ']')
+        {
+            get();
+            Token t = Token(TokenType::RightSquare, begin, m_begin);
+            return t;
+        }
+        if (c == ')')
+        {
+            Token t = Token(TokenType::RightParenthesis, begin, m_begin);
+            return t;
+        }
+        if (c == '{')
+        {
+            Token t = Token(TokenType::LeftBracket, begin, m_begin);
+            return t;
+        }
+        if (c == '}')
+        {
+            Token t = Token(TokenType::RightBracket, begin, m_begin);
+            return t;
+        }
+        if (c == ';')
+        {
+            Token t = Token(TokenType::Col, begin, m_begin);
+            return t;
+        }
+
+        return Token(TokenType::UnExpected, begin, m_begin);
+}
+
+char Lexer::peek()
 {
     return *m_begin;
 }
 
-char Scanner::get()
+char Lexer::get()
 {
     return *m_begin++;
 }
@@ -215,6 +322,26 @@ bool is_ident_char(char c) noexcept
     if (c >= '0' && c <= '9')
         return true;
     if (c == '_')
+        return true;
+
+    return false;
+}
+
+inline bool is_keyword(char *begin)
+{
+    if (!strncmp(begin, "auto", 4))
+        return true;
+    if (!strncmp(begin, "const", 5))
+        return true;
+    if (!strncmp(begin, "break", 5))
+        return true;
+    if (!strncmp(begin, "while", 5))
+        return true;
+    if (!strncmp(begin, "if", 2))
+        return true;
+    if (!strncmp(begin, "else", 4))
+        return true;
+    if (!strncmp(begin, "for", 3))
         return true;
 
     return false;

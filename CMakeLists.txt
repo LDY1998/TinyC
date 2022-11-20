@@ -38,13 +38,16 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-  hello_test
-  tests/hello_test.cc
+  lex_test
+  tests/lex_test.cc
 )
+
+target_include_directories(lex_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 target_link_libraries(
-  hello_test
+  lex_test
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(hello_test)
+gtest_discover_tests(lex_test)
