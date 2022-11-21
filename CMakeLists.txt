@@ -35,6 +35,9 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+find_package(antlr4-runtime REQUIRED)
+
+
 enable_testing()
 
 add_executable(
