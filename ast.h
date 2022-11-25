@@ -9,11 +9,13 @@ enum OperatorType
     Gt,
     Lt
 };
+
 class IASTNode
 {
 
 public:
     virtual ~IASTNode() {}
+    virtual void Accept(TinyCASTVisitor *visitor) const = 0;
 };
 
 class TypeSpec : public IASTNode
@@ -64,6 +66,10 @@ private:
 class Expression : public IASTNode
 {
 };
+
+class VarDecl : public IASTNode {
+    
+};
 class Assignment : public IASTNode
 {
     std::unique_ptr<Ident> var_name;
@@ -103,6 +109,15 @@ class FuncDecl : public IASTNode
     std::unique_ptr<TypeSpec> return_type;
     std::vector<std::unique_ptr<Expression>> params;
     std::unique_ptr<IASTNode> body;
+
+public:
+    FuncDecl(std::string &func_name,
+             std::unique_ptr<TypeSpec> return_type,
+             std::vector<std::unique_ptr<Expression>> &params,
+             std::unique_ptr<IASTNode> body) : func_name(func_name),
+                                               return_type(std::move(return_type)),
+                                               params(params),
+                                               body(std::move(body)) {}
 };
 
 /**
@@ -121,4 +136,7 @@ class FuncCall : public Expression
 {
     std::string func_name;
     std::vector<std::unique_ptr<Expression>> args;
+
+public:
+    FuncCall(std::string &name, std::vector<std::unique_ptr<Expression>> &args) : func_name(name), args(args) {}
 };

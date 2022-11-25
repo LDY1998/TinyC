@@ -19,6 +19,8 @@ public:
   /**
    * Visit parse trees produced by TinyCParse.
    */
+    virtual antlrcpp::Any visitProgram(TinyCParse::ProgramContext *context) = 0;
+
     virtual antlrcpp::Any visitConstant(TinyCParse::ConstantContext *context) = 0;
 
     virtual antlrcpp::Any visitBreakStmt(TinyCParse::BreakStmtContext *context) = 0;

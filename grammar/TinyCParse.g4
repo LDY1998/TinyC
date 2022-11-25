@@ -2,6 +2,8 @@ parser grammar TinyCParse;
 
 options {   tokenVocab = TinyCLex; }
 
+program: decl* func+;
+
 constant: NUMCONST | CHARCONST | STRINGCONST | BOOLCONST;
 breakStmt: BREAK;
 

@@ -22,9 +22,9 @@ public:
   };
 
   enum {
-    RuleConstant = 0, RuleBreakStmt = 1, RuleParam = 2, RuleExpr = 3, RuleFunc = 4, 
-    RuleAssign = 5, RuleDecl = 6, RuleRet = 7, RuleForStmt = 8, RuleWhileStmt = 9, 
-    RuleStmt = 10, RuleBlock = 11
+    RuleProgram = 0, RuleConstant = 1, RuleBreakStmt = 2, RuleParam = 3, 
+    RuleExpr = 4, RuleFunc = 5, RuleAssign = 6, RuleDecl = 7, RuleRet = 8, 
+    RuleForStmt = 9, RuleWhileStmt = 10, RuleStmt = 11, RuleBlock = 12
   };
 
   TinyCParse(antlr4::TokenStream *input);
@@ -37,6 +37,7 @@ public:
   virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
 
+  class ProgramContext;
   class ConstantContext;
   class BreakStmtContext;
   class ParamContext;
@@ -49,6 +50,24 @@ public:
   class WhileStmtContext;
   class StmtContext;
   class BlockContext; 
+
+  class  ProgramContext : public antlr4::ParserRuleContext {
+  public:
+    ProgramContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<DeclContext *> decl();
+    DeclContext* decl(size_t i);
+    std::vector<FuncContext *> func();
+    FuncContext* func(size_t i);
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ProgramContext* program();
 
   class  ConstantContext : public antlr4::ParserRuleContext {
   public:

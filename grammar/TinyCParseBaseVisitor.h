@@ -15,6 +15,10 @@
 class  TinyCParseBaseVisitor : public TinyCParseVisitor {
 public:
 
+  virtual antlrcpp::Any visitProgram(TinyCParse::ProgramContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitConstant(TinyCParse::ConstantContext *ctx) override {
     return visitChildren(ctx);
   }

@@ -16,6 +16,9 @@
 class  TinyCParseBaseListener : public TinyCParseListener {
 public:
 
+  virtual void enterProgram(TinyCParse::ProgramContext * /*ctx*/) override { }
+  virtual void exitProgram(TinyCParse::ProgramContext * /*ctx*/) override { }
+
   virtual void enterConstant(TinyCParse::ConstantContext * /*ctx*/) override { }
   virtual void exitConstant(TinyCParse::ConstantContext * /*ctx*/) override { }
 

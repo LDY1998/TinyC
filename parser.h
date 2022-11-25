@@ -1,7 +1,18 @@
 #include "lexer.h"
 #include "ast.h"
+#include "TinyCParseBaseVisitor.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
 
+class TinyCLLVMVisitor : public TinyCParseBaseVisitor {
 
+antlrcpp::Any visitExpr(TinyCParse::ExprContext) {
+
+    }
+    private:
+    llvm::IRBuilder<> Builder;
+    llvm::LLVMContext context;
+};
 
 class Parser {
     public:

@@ -14,6 +14,9 @@
 class  TinyCParseListener : public antlr4::tree::ParseTreeListener {
 public:
 
+  virtual void enterProgram(TinyCParse::ProgramContext *ctx) = 0;
+  virtual void exitProgram(TinyCParse::ProgramContext *ctx) = 0;
+
   virtual void enterConstant(TinyCParse::ConstantContext *ctx) = 0;
   virtual void exitConstant(TinyCParse::ConstantContext *ctx) = 0;
 
