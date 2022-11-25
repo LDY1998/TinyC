@@ -29,15 +29,17 @@ RIGHTSQUARE: ']';
 ASSIGN: '=' | '+=' | '-=' | '/=';
 ELSE: 'else';
 
+ID: LETTER LETDIG*;
+NUMCONST: DIGIT+;
 
 LETTER: [a-zA-Z]+;
 DIGIT: [0-9];
 LETDIG: DIGIT | LETTER;
 
 
-ID: LETTER LETDIG*;
 
-NUMCONST: DIGIT+;
+
+
 WS: [ \r\n\t]+ -> skip;
 CHARCONST: '\'' .*? '\'';
 STRINGCONST: '"' .*? '"';

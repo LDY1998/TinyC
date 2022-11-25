@@ -11,7 +11,7 @@ using namespace tinyc_parser;
 
 int main(int argc, const char* argv[]) {
     std::ifstream stream;
-    stream.open((char*)argv);
+    stream.open((char*)argv[1]);
 
     ANTLRInputStream input(stream);
     TinyCLex lexer(&input);
