@@ -15,7 +15,11 @@ whileStmt: WHILE LEFTPAREN expr RIGHTPAREN (stmt | block);
 
 block: LEFTBRACKET stmt* RIGHTBRACKET;
 
-constant: NUMCONST | CHARCONST | STRINGCONST | BOOLCONST;
+constant: numConst | charConst | strConst | boolConst;
+numConst: NUMCONST;
+charConst: CHARCONST;
+strConst: STRINGCONST;
+boolConst: BOOLCONST;
 breakStmt: BREAK;
 
 param: TYPESPEC (LEFTSQUARE RIGHTSQUARE)* ID;

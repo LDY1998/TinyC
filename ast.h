@@ -1,4 +1,5 @@
 #include <memory>
+#include <vector>
 
 enum OperatorType
 {
@@ -14,8 +15,8 @@ class IASTNode
 {
 
 public:
-    virtual ~IASTNode() {}
-    virtual void Accept(TinyCASTVisitor *visitor) const = 0;
+    // virtual ~IASTNode() {}
+    // virtual void Accept(TinyCASTVisitor *visitor) const = 0;
 };
 
 class TypeSpec : public IASTNode
@@ -25,14 +26,7 @@ class TypeSpec : public IASTNode
 public:
     TypeSpec(const std::string &ty) : ty(ty) {}
 };
-class VarDecl : public IASTNode
-{
-    std::unique_ptr<Ident> name;
-    std::unique_ptr<TypeSpec> type_decl;
 
-public:
-    VarDecl(std::unique_ptr<Ident> name, std::unique_ptr<TypeSpec> ty) : name(std::move(name)), type_decl(std::move(ty)) {}
-};
 
 class Ident : public IASTNode
 {
@@ -65,11 +59,19 @@ private:
 
 class Expression : public IASTNode
 {
-};
-
-class VarDecl : public IASTNode {
     
 };
+
+
+class VarDecl : public IASTNode
+{
+    std::unique_ptr<Ident> name;
+    std::unique_ptr<TypeSpec> type_decl;
+
+public:
+    VarDecl(std::unique_ptr<Ident> name, std::unique_ptr<TypeSpec> ty) : name(std::move(name)), type_decl(std::move(ty)) {}
+};
+
 class Assignment : public IASTNode
 {
     std::unique_ptr<Ident> var_name;
@@ -99,6 +101,12 @@ private:
     std::unique_ptr<Expression> false_expr;
 };
 
+class Params : public IASTNode{
+    public:
+    std::vector<std::unique_ptr<Expression>> exprs;
+
+};
+
 /**
  * @brief Funciton declaration node
  *
@@ -113,10 +121,10 @@ class FuncDecl : public IASTNode
 public:
     FuncDecl(std::string &func_name,
              std::unique_ptr<TypeSpec> return_type,
-             std::vector<std::unique_ptr<Expression>> &params,
+             std::vector<std::unique_ptr<Expression>>&& params,
              std::unique_ptr<IASTNode> body) : func_name(func_name),
                                                return_type(std::move(return_type)),
-                                               params(params),
+                                               params(std::move(params)),
                                                body(std::move(body)) {}
 };
 
@@ -138,5 +146,5 @@ class FuncCall : public Expression
     std::vector<std::unique_ptr<Expression>> args;
 
 public:
-    FuncCall(std::string &name, std::vector<std::unique_ptr<Expression>> &args) : func_name(name), args(args) {}
+    FuncCall(std::string &name, std::vector<std::unique_ptr<Expression>> &args) : func_name(name), args(std::move(args)) {}
 };

@@ -1,9 +1,8 @@
 #include <iostream>
 #include <fstream>
-// #include "grammar/TinyCLex.h"
-// #include "grammar/TinyCParse.h"
 #include "build/antlr4_generated_src/tinyc_lexer/TinyCLex.h"
 #include "build/antlr4_generated_src/tinyc_parser/TinyCParse.h"
+#include "visitor.h"
 
 using namespace antlr4;
 using namespace tinyc_lexer;
@@ -19,6 +18,9 @@ int main(int argc, const char* argv[]) {
     TinyCParse parser(&tokens);
 
     TinyCParse::ProgramContext* tree = parser.program();
+
+    TinyCParseTreeVisitor visitor;
+    visitor.visitProgram(tree);
 
     return 0;
 }
