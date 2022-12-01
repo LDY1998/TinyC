@@ -1,8 +1,148 @@
 #include "build/antlr4_generated_src/tinyc_parser/TinyCParseBaseVisitor.h"
 #include "ast.h"
 #include <iostream>
+#include "common.h"
 
 using namespace tinyc_parser;
+
+namespace visitor
+{
+    class AbstractASTVisitor
+    {
+    public:
+        virtual std::any visitChildren(ast::TinyCAST *node)
+        {
+            std::any result = defaultResult();
+            size_t n = node->children.size();
+            for (size_t i = 0; i < n; i++)
+            {
+                if (!shouldVisitNextChild(node, result))
+                {
+                    break;
+                }
+
+                std::any childResult = node->children[i]->accept(this);
+                result = aggregateResult(std::move(result), std::move(childResult));
+            }
+
+            return result;
+        }
+        virtual std::any visit(ast::TinyCAST *tree)
+        {
+            return tree->accept(this);
+        }
+
+        virtual bool shouldVisitNextChild(ast::TinyCAST * /*node*/, const std::any & /*currentResult*/)
+        {
+            return true;
+        }
+
+        virtual std::any defaultResult()
+        {
+            return std::any();
+        }
+
+        virtual std::any aggregateResult(std::any /*aggregate*/, std::any nextResult)
+        {
+            return nextResult;
+        }
+
+    private:
+    };
+
+    class TinyCASTVisitor : public AbstractASTVisitor
+    {
+    public:
+        std::any visitProgram(ast::Program *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitStmt(ast::Stmt *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitFunc(ast::Func *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitAssign(ast::Assign *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitDecl(ast::Decl *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitRet(ast::Ret *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitForStmt(ast::For *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitWhileStmt(ast::While *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitBlock(ast::Block *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitNumConst(ast::NumConst *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitCharConst(ast::CharConst *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitStrConst(ast::StrConst *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitBoolConst(ast::BoolConst *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitBreakStmt(ast::Break *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitParam(ast::Param *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitExpr(ast::Expr *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitIdent(ast::Ident *ctx)
+        {
+            return visitChildren(ctx);
+        }
+
+        std::any visitTy(ast::Ty *ctx) {
+            return visitChildren(ctx);
+        }
+    };
+}
 
 class TinyCASTGenerateVisitor : public TinyCParseBaseVisitor
 {
@@ -105,7 +245,9 @@ public:
 
         std::cout << ctx->getText() << std::endl;
         indent++;
-        return visitChildren(ctx);
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitStmt(TinyCParse::StmtContext *ctx) override
@@ -113,9 +255,11 @@ public:
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
         std::cout << "visitStmt: ";
-
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitFunc(TinyCParse::FuncContext *ctx) override
@@ -125,18 +269,23 @@ public:
         std::cout << "visitFunc: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitAssign(TinyCParse::AssignContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitAssign: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitDecl(TinyCParse::DeclContext *ctx) override
@@ -144,97 +293,115 @@ public:
 
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitDecl: ";
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitRet(TinyCParse::RetContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitRet: ";
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitForStmt(TinyCParse::ForStmtContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitFor: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitWhileStmt(TinyCParse::WhileStmtContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitWhile: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitBlock(TinyCParse::BlockContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitBlock: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitConstant(TinyCParse::ConstantContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitConst: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitCharConst(TinyCParse::CharConstContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitCharConst: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitStrConst(TinyCParse::StrConstContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitStrConst: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitBoolConst(TinyCParse::BoolConstContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitBoolConst: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitBreakStmt(TinyCParse::BreakStmtContext *ctx) override
@@ -242,30 +409,36 @@ public:
         std::cout << "visitBreakConst: ";
 
         std::cout << ctx->getText() << std::endl;
-        std::cout << "\t\t|-";
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitParam(TinyCParse::ParamContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitParam: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 
     std::any visitExpr(TinyCParse::ExprContext *ctx) override
     {
         for (int i = 0; i < indent; i++)
             std::cout << "\t";
-        indent++;
         std::cout << "visitExpr: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
     std::any visitNumConst(TinyCParse::NumConstContext *ctx) override
     {
@@ -275,6 +448,35 @@ public:
         std::cout << "visitNumConst: ";
 
         std::cout << ctx->getText() << std::endl;
-        return visitChildren(ctx);
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
+    }
+
+    std::any visitType(TinyCParse::TypeContext *ctx) override
+    {
+        for (int i = 0; i < indent; i++)
+            std::cout << "\t";
+        std::cout << "visitType: ";
+
+        std::cout << ctx->getText() << std::endl;
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
+    }
+
+    std::any visitIdent(TinyCParse::IdentContext *ctx) override
+    {
+        for (int i = 0; i < indent; i++)
+            std::cout << "\t";
+        std::cout << "visitIdent: ";
+
+        std::cout << ctx->getText() << std::endl;
+        indent++;
+        std::any res = visitChildren(ctx);
+        indent--;
+        return res;
     }
 };

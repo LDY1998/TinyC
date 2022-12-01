@@ -19,7 +19,7 @@ int main(int argc, const char* argv[]) {
 
     TinyCParse::ProgramContext* tree = parser.program();
 
-    TinyCParseTreeVisitor visitor;
+    TinyCParseTreePrintVisitor visitor;
     visitor.visitProgram(tree);
 
     return 0;
