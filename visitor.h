@@ -1,54 +1,12 @@
 #include "build/antlr4_generated_src/tinyc_parser/TinyCParseBaseVisitor.h"
-#include "ast.h"
 #include <iostream>
-#include "common.h"
+#include "ast.h"
 
 using namespace tinyc_parser;
 
 namespace visitor
 {
-    class AbstractASTVisitor
-    {
-    public:
-        virtual std::any visitChildren(ast::TinyCAST *node)
-        {
-            std::any result = defaultResult();
-            size_t n = node->children.size();
-            for (size_t i = 0; i < n; i++)
-            {
-                if (!shouldVisitNextChild(node, result))
-                {
-                    break;
-                }
-
-                std::any childResult = node->children[i]->accept(this);
-                result = aggregateResult(std::move(result), std::move(childResult));
-            }
-
-            return result;
-        }
-        virtual std::any visit(ast::TinyCAST *tree)
-        {
-            return tree->accept(this);
-        }
-
-        virtual bool shouldVisitNextChild(ast::TinyCAST * /*node*/, const std::any & /*currentResult*/)
-        {
-            return true;
-        }
-
-        virtual std::any defaultResult()
-        {
-            return std::any();
-        }
-
-        virtual std::any aggregateResult(std::any /*aggregate*/, std::any nextResult)
-        {
-            return nextResult;
-        }
-
-    private:
-    };
+    
 
     class TinyCASTVisitor : public AbstractASTVisitor
     {

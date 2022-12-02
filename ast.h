@@ -1,6 +1,9 @@
-#include <memory>
+// #include "visitor.h"
+// #include "common.h"
+#include <string>
 #include <vector>
-#include "common.h"
+#include <any>
+#include "visitor_interface.h"
 
 namespace ast
 {
@@ -68,7 +71,7 @@ namespace ast
         template <typename T>
         std::vector<T *> getChildren() const
         {
-            static_assert(std::is_base_of_v<TinyCAST, T>, "T must be derived from RuleContext");
+            static_assert(std::is_base_of_v<TinyCAST, T>, "T must be derived from TinyCAST");
             std::vector<T *> contexts;
             for (auto *child : children)
             {
@@ -88,208 +91,107 @@ namespace ast
     {
 
     public:
-        std::vector<Func *> func()
-        {
-            return getChildren<Func>();
-        }
-        std::vector<Stmt *> stmt()
-        {
-            return getChildren<Stmt>();
-        }
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto programVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-            {
-                return programVisitor->visitProgram(this);
-            }
-            return visitor->visitChildren(this);
-        };
+        std::vector<Func *> func();
+        std::vector<Stmt *> stmt();
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Stmt : public TinyCAST
     {
-
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto stmtVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return stmtVisitor->visitStmt(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Func : public TinyCAST
     {
-
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto funcVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return funcVisitor->visitFunc(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Assign : public TinyCAST
     {
-
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto assignVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return assignVisitor->visitAssign(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Decl : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto declVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return declVisitor->visitDecl(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Ret : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto retVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return retVisitor->visitRet(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class For : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto forVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return forVisitor->visitForStmt(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class While : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto whileVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return whileVisitor->visitWhileStmt(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Block : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto blockVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return blockVisitor->visitBlock(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class NumConst : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto numVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return numVisitor->visitNumConst(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class CharConst : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto charVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return charVisitor->visitCharConst(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class StrConst : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto strVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return strVisitor->visitStrConst(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class BoolConst : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto boolVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return boolVisitor->visitBoolConst(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Break : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto breakVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return breakVisitor->visitBreakStmt(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Param : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto paramVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return paramVisitor->visitParam(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Expr : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto exprVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return exprVisitor->visitExpr(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Ty : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto tyVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return tyVisitor->visitTy(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 
     class Ident : public TinyCAST
     {
 
-        virtual std::any accept(AbstractASTVisitor *visitor)
-        {
-            if (auto identVisitor = dynamic_cast<TinyCASTVisitor *>(visitor))
-                return identVisitor->visitIdent(this);
-            return visitor->visitChildren(this);
-        }
+        virtual std::any accept(AbstractASTVisitor *visitor);
     };
 }

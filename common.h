@@ -1,4 +1,13 @@
+#include <any>
+#include <memory>
+#include <vector>
 
+namespace visitor
+{
+
+    class AbstractASTVisitor;
+    class TinyCASTVisitor;
+}
 
 namespace ast
 {
@@ -23,9 +32,3 @@ namespace ast
     class Ident;
 }
 
-namespace visitor
-{
-
-    class AbstractASTVisitor;
-    class TinyCASTVisitor;
-}
